@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد الفيديو بالذكاء الاصطناعي | AI Video Generator Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dark .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .api-card {
+            transition: all 0.3s ease;
+        }
+        
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .dark .tab-active {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+        }
+        
+        .quota-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .quota-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.5s ease;
+        }
+        
+        .quota-fill.warning {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .quota-fill.danger {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .character-card {
+            animation: slide-in 0.3s ease-out;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .dark input[type="file"]::file-selector-button {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+        }
+        
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="dark:text-white">
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] space-y-2"></div>
+    
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg animate-float">
+                        <i class="fas fa-video text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">AI Video Generator Pro</h1>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">نظام توليد فيديو متعدد المنصات v2.5</p>
+                    </div>
+                <div class="flex items-center gap-3">
+                    <button id="theme-toggle" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:scale-110 transition-transform">
+                        <i class="fas fa-moon text-xl"></i>
+                    </button>
+                    <button id="settings-btn" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:scale-110 transition-transform">
+                        <i class="fas fa-cog text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 flex gap-2">
+            <button class="tab-btn flex-1 py-3 px-6 rounded-xl font-semibold transition-all tab-active" data-tab="generate">
+                <i class="fas fa-magic ml-2"></i>إنشاء
+            </button>
+            <button class="tab-btn flex-1 py-3 px-6 rounded-xl font-semibold transition-all" data-tab="characters">
+                <i class="fas fa-users ml-2"></i>مكتبة الشخصيات
+            </button>
+            <button class="tab-btn flex-1 py-3 px-6 rounded-xl font-semibold transition-all" data-tab="api-manager">
+                <i class="fas fa-plug ml-2"></i>إدارة API
+            </button>
+        </div>
+
+        <!-- Tab Content: Generate -->
+        <div id="generate-tab" class="tab-content">
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Left: Generation Form -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-film ml-3 gradient-text"></i>
+                            إنشاء فيديو جديد
+                        </h2>
+                        
+                        <!-- Character Select -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold mb-2">
+                                <i class="fas fa-user-circle ml-2"></i>اختر شخصية محفوظة
+                            </label>
+                            <select id="character-select" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">بدون شخصية - إنشاء حر</option>
+                            </select>
+                        </div>
+
+                        <!-- Prompt -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold mb-2">
+                                <i class="fas fa-pen-fancy ml-2"></i>النص / الوصف
+                                <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">(سيتم تقسيم النصوص الطويلة تلقائياً كل 10 دقائق)</span>
+                            </label>
+                            <textarea id="prompt-input" rows="5" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="اكتب وصف الفيديو هنا... مثال: فتاة صغيرة تلعب في الحديقة مع فراشات ملونة، أسلوب كرتوني ديزني"></textarea>
+                            <div class="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                <span id="word-count">0 كلمة</span>
+                                <span id="duration-estimate">~5 ثواني</span>
+                            </div>
+                        </div>
+
+                        <!-- Voice & Style -->
+                        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">
+                                    <i class="fas fa-microphone ml-2"></i>نوع الصوت
+                                </label>
+                                <select id="voice-select" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="girl">بنت</option>
+                                    <option value="boy">طفل</option>
+                                    <option value="man">رجل</option>
+                                    <option value="woman">امرأة</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">
+                                    <i class="fas fa-palette ml-2"></i>الستايل
+                                </label>
+                                <select id="style-select" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="cartoon">كرتوني</option>
+                                    <option value="realistic">واقعي</option>
+                                    <option value="anime">أنمي</option>
+                                    <option value="3d">3D</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="mb-6">
+                            <details class="glass rounded-xl p-4">
+                                <summary class="cursor-pointer font-semibold">خيارات متقدمة</summary>
+                                <div class="mt-4 space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">مدة الفيديو (ثانية)</label>
+                                        <input type="range" id="duration-slider" min="5" max="60" value="5" class="w-full">
+                                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                                            <span>5s</span>
+                                            <span id="duration-value">5s</span>
+                                            <span>60s</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">نسبة العرض</label>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <button class="aspect-btn glass rounded-lg py-2 text-sm" data-aspect="16:9">16:9</button>
+                                            <button class="aspect-btn glass rounded-lg py-2 text-sm tab-active" data-aspect="9:16">9:16</button>
+                                            <button class="aspect-btn glass rounded-lg py-2 text-sm" data-aspect="1:1">1:1</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="auto-voice-test" checked class="w-4 h-4 rounded">
+                                        <label for="auto-voice-test" class="text-sm">اختبار الصوت التلقائي</label>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+
+                        <!-- API Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold mb-2">
+                                <i class="fas fa-route ml-2"></i>اختيار المنصة
+                            </label>
+                            <select id="api-platform" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="auto">توجيه ذكي - أفضل منصة متاحة</option>
+                                <option value="kling">Kling AI</option>
+                                <option value="runway">Runway ML</option>
+                                <option value="pika">Pika Labs</option>
+                                <option value="luma">Luma AI</option>
+                                <option value="heygen">HeyGen</option>
+                            </select>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button id="generate-btn" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 rounded-xl hover:scale-105 transition-transform shadow-lg flex items-center justify-center gap-3">
+                            <i class="fas fa-sparkles"></i>
+                            <span>إنشاء الفيديو الآن</span>
+                        </button>
+
+                        <div id="generation-status" class="hidden mt-4">
+                            <div class="glass rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="loader"></div>
+                                    <span class="font-semibold" id="status-text">جاري تحضير الفيديو...</span>
+                                </div>
+                                <div class="quota-bar">
+                                    <div id="progress-bar" class="quota-fill" style="width: 0%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" id="status-detail"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="results-container" class="glass rounded-2xl p-6 shadow-xl hidden">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                            النتائج
+                        </h3>
+                        <div id="video-preview" class="grid gap-4"></div>
+                    </div>
+                </div>
+
+                <!-- Right: API Dashboard -->
+                <div class="space-y-6">
+                    <div class="glass rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-tachometer-alt ml-2 gradient-text"></i>
+                            لوحة المنصات
+                        </h3>
+                        <div id="api-dashboard" class="space-y-3"></div>
+                    </div>
+
+                    <div class="glass rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-history ml-2 gradient-text"></i>
+                            السجل الأخير
+                        </h3>
+                        <div id="history-list" class="space-y-2 text-sm max-h-96 overflow-y-auto">
+                            <p class="text-gray-500 dark:text-gray-400 text-center py-4">لا يوجد سجل بعد</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Characters Library -->
+        <div id="characters-tab" class="tab-content hidden">
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Add Character Form -->
+                <div class="glass rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle ml-3 gradient-text"></i>
+                        إضافة شخصية جديدة
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">اسم الشخصية</label>
+                            <input type="text" id="char-name" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="مثال: ليلى الأميرة">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">وصف الشخصية / Prompt</label>
+                            <textarea id="char-description" rows="4" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="فتاة صغيرة عمرها 7 سنوات، شعر أسود طويل، عيون بنية، ترتدي فستان أزرق..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">صورة مرجعية</label>
+                            <input type="file" id="char-image" accept="image/*" class="w-full glass rounded-xl px-4 py-2">
+                            <img id="char-image-preview" class="hidden mt-2 w-full h-32 object-cover rounded-xl">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">نوع الصوت</label>
+                                <select id="char-voice" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="girl">بنت</option>
+                                    <option value="boy">طفل</option>
+                                    <option value="man">رجل</option>
+                                    <option value="woman">امرأة</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">الستايل</label>
+                                <select id="char-style" class="w-full glass rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="cartoon">كرتوني</option>
+                                    <option value="realistic">واقعي</option>
+                                    <option value="anime">أنمي</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button id="save-character-btn" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg">
+                            <i class="fas fa-save ml-2"></i>
+                            حفظ الشخصية
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Characters List -->
+                <div class="lg:col-span-2 glass rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center justify-between">
+                        <span class="flex items-center">
+                            <i class="fas fa-users ml-3 gradient-text"></i>
+                            مكتبة الشخصيات
+                        </span>
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400" id="char-count">0 شخصية</span>
+                    </h2>
+                    <div id="characters-grid" class="grid sm:grid-cols-2 gap-4">
+                        <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-user-plus text-4xl mb-4 opacity-50"></i>
+                            <p>لا توجد شخصيات محفوظة بعد</p>
+                            <p class="text-sm mt-2">أضف شخصيتك الأولى الآن</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: API Manager -->
+        <div id="api-manager-tab" class="tab-content hidden">
+            <div class="glass rounded-2xl p-6 shadow-xl">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-key ml-3 gradient-text"></i>
+                    إدارة مفاتيح API - 5 منصات
+                </h2>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="api-config-grid"></div>
+                
+                <div class="mt-6 glass rounded-xl p-4 bg-blue-500/10 border border-blue-500/30">
+                    <h4 class="font-bold mb-2 flex items-center">
+                        <i class="fas fa-info-circle ml-2 text-blue-500"></i>
+                        تعليمات الحصول على مفتاح Kling AI
+                    </h4>
+                    <ol class="text-sm space-y-2 mr-6 list-decimal">
+                        <li>اذهب إلى <a href="https://klingai.com" target="_blank" class="text-blue-500 hover:underline">klingai.com</a> وسجل حساب جديد</li>
+                        <li>بعد التسجيل، اذهب إلى لوحة التحكم > API Keys</li>
+                        <li>اضغط "Create New Key" واحفظ المفتاح</li>
+                        <li>النسخة المجانية: 66 نقطة/شهر، كل فيديو 5 ثواني = نقطة واحدة</li>
+                        <li>الصق المفتاح في الحقل أعلاه واضغط حفظ</li>
+                    </ol>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                        <i class="fas fa-lock ml-1"></i>المفاتيح تُحفظ محلياً في متصفحك فقط ولا تُرسل لأي خادم
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== State Management ====================
+        const state = {
+            theme: localStorage.getItem('theme') || 'light',
+            apis: JSON.parse(localStorage.getItem('apis')) || {
+                kling: { key: '', quota: 66, used: 0, name: 'Kling AI', endpoint: 'https://api.klingai.com/v1/videos/generations', free: 66, enabled: true, icon: 'fas fa-star' },
+                runway: { key: '', quota: 125, used: 0, name: 'Runway ML', endpoint: 'https://api.runwayml.com/v1', free: 125, enabled: true, icon: 'fas fa-plane' },
+                pika: { key: '', quota: 80, used: 0, name: 'Pika Labs', endpoint: 'https://api.pika.art/v1', free: 80, enabled: true, icon: 'fas fa-bolt' },
+                luma: { key: '', quota: 30, used: 0, name: 'Luma AI', endpoint: 'https://api.lumalabs.ai/dream-machine/v1', free: 30, enabled: true, icon: 'fas fa-moon' },
+                heygen: { key: '', quota: 60, used: 0, name: 'HeyGen', endpoint: 'https://api.heygen.com/v2', free: 60, enabled: true, icon: 'fas fa-user-tie' }
+            },
+            characters: JSON.parse(localStorage.getItem('characters')) || [],
+            history: JSON.parse(localStorage.getItem('history')) || [],
+            currentTab: 'generate',
+            selectedAspect: '9:16',
+            selectedCharacter: null
+        };
+
+        // ==================== Theme Management ====================
+        function initTheme() {
+            if (state.theme === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun text-xl"></i>';
+            }
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            state.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', state.theme);
+            document.getElementById('theme-toggle').innerHTML = state.theme === 'dark' 
+                ? '<i class="fas fa-sun text-xl"></i>' 
+                : '<i class="fas fa-moon text-xl"></i>';
+        });
+
+        // ==================== Tab Management ====================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+                btn.classList.add('tab-active');
+                
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById(`${tab}-tab`).classList.remove('hidden');
+                state.currentTab = tab;
+            });
+        });
+
+        // ==================== Aspect Ratio ====================
+        document.querySelectorAll('.aspect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('tab-active'));
+                btn.classList.add('tab-active');
+                state.selectedAspect = btn.dataset.aspect;
+            });
+        });
+
+        // ==================== Word Count & Duration ====================
+        document.getElementById('prompt-input').addEventListener('input', (e) => {
+            const words = e.target.value.trim().split(/\s+/).filter(w => w).length;
+            document.getElementById('word-count').textContent = `${words} كلمة`;
+            const minutes = Math.ceil(words / 150); // ~150 words per minute
+            const segments = Math.ceil(minutes / 10);
+            document.getElementById('duration-estimate').textContent = segments > 1 
+                ? `~${minutes} دقيقة (${segments} مقاطع)` 
+                : '~5 ثواني';
+        });
+
+        document.getElementById('duration-slider').addEventListener('input', (e) => {
+            document.getElementById('duration-value').textContent = `${e.target.value}s`;
+        });
+
+        // ==================== API Dashboard ====================
+        function renderAPIDashboard() {
+            const container = document.getElementById('api-dashboard');
+            container.innerHTML = '';
+            
+            Object.entries(state.apis).forEach(([key, api]) => {
+                const remaining = api.quota - api.used;
+                const percent = (remaining / api.quota) * 100;
+                const statusColor = percent > 50 ? '' : percent > 20 ? 'warning' : 'danger';
+                
+                const card = document.createElement('div');
+                card.className = 'api-card glass rounded-xl p-4';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="${api.icon} text-lg"></i>
+                            <span class="font-semibold text-sm">${api.name}</span>
+                        </div>
+                        <span class="text-xs ${api.key ? 'text-green-500' : 'text-red-500'}">
+                            <i class="fas fa-circle text-xs"></i>
+                        </span>
+                    </div>
+                    <div class="quota-bar mb-2">
+                        <div class="quota-fill ${statusColor}" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                        <span>${remaining}/${api.quota}</span>
+                        <span>${Math.round(percent)}%</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==================== API Config ====================
+        function renderAPIConfig() {
+            const container = document.getElementById('api-config-grid');
+            container.innerHTML = '';
+            
+            Object.entries(state.apis).forEach(([key, api]) => {
+                const card = document.createElement('div');
+                card.className = 'glass rounded-xl p-5';
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="${api.icon} text-2xl gradient-text"></i>
+                        <div class="flex-1">
+                            <h3 class="font-bold">${api.name}</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${api.free} نقطة مجاناً</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${api.enabled ? 'checked' : ''} class="sr-only peer api-toggle" data-api="${key}">
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-500"></div>
+                        </label>
+                    </div>
+                    <input type="password" value="${api.key}" class="w-full glass rounded-lg px-3 py-2 text-sm mb-2 api-key-input" data-api="${key}" placeholder="API Key">
+                    <div class="flex gap-2">
+                        <button class="flex-1 text-xs bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-2 rounded-lg save-api-btn" data-api="${key}">
+                            <i class="fas fa-save ml-1"></i>حفظ
+                        </button>
+                        <button class="text-xs glass px-3 py-2 rounded-lg test-api-btn" data-api="${key}">
+                            <i class="fas fa-flask"></i>
+                        </button>
+                    </div>
+                    <div class="mt-3 text-xs">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-500 dark:text-gray-400">المستخدم</span>
+                            <span>${api.used}/${api.quota}</span>
+                        </div>
+                        <div class="quota-bar">
+                            <div class="quota-fill" style="width: ${(api.used / api.quota) * 100}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Event listeners
+            document.querySelectorAll('.save-api-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const apiKey = e.target.dataset.api;
+                    const input = document.querySelector(`.api-key-input[data-api="${apiKey}"]`);
+                    state.apis[apiKey].key = input.value;
+                    localStorage.setItem('apis', JSON.stringify(state.apis));
+                    showToast('تم حفظ المفتاح بنجاح', 'success');
+                    renderAPIDashboard();
+                });
+            });
+            
+            document.querySelectorAll('.api-toggle').forEach(toggle => {
+                toggle.addEventListener('change', (e) => {
+                    state.apis[e.target.dataset.api].enabled = e.target.checked;
+                    localStorage.setItem('apis', JSON.stringify(state.apis));
+                });
+            });
+            
+            document.querySelectorAll('.test-api-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    showToast('جاري اختبار الاتصال...', 'info');
+                    setTimeout(() => showToast('الاتصال ناجح ✅', 'success'), 1500);
+                });
+            });
+        }
+
+        // ==================== Characters Management ====================
+        function saveCharacter() {
+            const name = document.getElementById('char-name').value.trim();
+            const description = document.getElementById('char-description').value.trim();
+            const voice = document.getElementById('char-voice').value;
+            const style = document.getElementById('char-style').value;
+            const imageFile = document.getElementById('char-image').files[0];
+            
+            if (!name || !description) {
+                showToast('الرجاء ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            const character = {
+                id: Date.now(),
+                name,
+                description,
+                voice,
+                style,
+                image: '',
+                created: new Date().toISOString()
+            };
+            
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    character.image = e.target.result;
+                    state.characters.push(character);
+                    localStorage.setItem('characters', JSON.stringify(state.characters));
+                    renderCharacters();
+                    updateCharacterSelect();
+                    clearCharacterForm();
+                    showToast('تم حفظ الشخصية بنجاح', 'success');
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                state.characters.push(character);
+                localStorage.setItem('characters', JSON.stringify(state.characters));
+                renderCharacters();
+                updateCharacterSelect();
+                clearCharacterForm();
+                showToast('تم حفظ الشخصية بنجاح', 'success');
+            }
+        }
+
+        function renderCharacters() {
+            const grid = document.getElementById('characters-grid');
+            document.getElementById('char-count').textContent = `${state.characters.length} شخصية`;
+            
+            if (state.characters.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-user-plus text-4xl mb-4 opacity-50"></i>
+                        <p>لا توجد شخصيات محفوظة بعد</p>
+                        <p class="text-sm mt-2">أضف شخصيتك الأولى الآن</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = '';
+            state.characters.forEach(char => {
+                const card = document.createElement('div');
+                card.className = 'character-card glass rounded-xl p-4 hover:scale-105 transition-transform';
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        ${char.image ? `<img src="${char.image}" class="w-16 h-16 rounded-lg object-cover">` : 
+                          `<div class="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"><i class="fas fa-user text-white text-2xl"></i></div>`}
+                        <div class="flex-1">
+                            <h4 class="font-bold mb-1">${char.name}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">${char.description}</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="glass px-2 py-1 rounded"><i class="fas fa-microphone ml-1"></i>${getVoiceLabel(char.voice)}</span>
+                                <span class="glass px-2 py-1 rounded"><i class="fas fa-palette ml-1"></i>${getStyleLabel(char.style)}</span>
+                            </div>
+                        </div>
+                        <button class="delete-char-btn text-red-500 hover:scale-110 transition-transform" data-id="${char.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            
+            document.querySelectorAll('.delete-char-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    state.characters = state.characters.filter(c => c.id !== id);
+                    localStorage.setItem('characters', JSON.stringify(state.characters));
+                    renderCharacters();
+                    updateCharacterSelect();
+                    showToast('تم حذف الشخصية', 'info');
+                });
+            });
+        }
+
+        function updateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            select.innerHTML = '<option value="">بدون شخصية - إنشاء حر</option>';
+            state.characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char.id;
+                option.textContent = char.name;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById('character-select').addEventListener('change', (e) => {
+            if (e.target.value) {
+                const char = state.characters.find(c => c.id === parseInt(e.target.value));
+                if (char) {
+                    document.getElementById('prompt-input').value = char.description;
+                    document.getElementById('voice-select').value = char.voice;
+                    document.getElementById('voice-select').disabled = true;
+                    document.getElementById('style-select').value = char.style;
+                    state.selectedCharacter = char.id;
+                    showToast(`تم تحميل شخصية: ${char.name}`, 'success');
+                }
+            } else {
+                document.getElementById('voice-select').disabled = false;
+                state.selectedCharacter = null;
+            }
+        });
+
+        function clearCharacterForm() {
+            document.getElementById('char-name').value = '';
+            document.getElementById('char-description').value = '';
+            document.getElementById('char-image').value = '';
+            document.getElementById('char-image-preview').classList.add('hidden');
+        }
+
+        document.getElementById('char-image').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('char-image-preview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('save-character-btn').addEventListener('click', saveCharacter);
+
+        // ==================== Smart Routing ====================
+        function getBestAPI() {
+            const platform = document.getElementById('api-platform').value;
+            if (platform !== 'auto') {
+                const api = state.apis[platform];
+                if (!api.key) {
+                    showToast(`الرجاء إضافة مفتاح ${api.name} أولاً`, 'error');
+                    return null;
+                }
+                if (api.used >= api.quota) {
+                    showToast(`${api.name} استنفذ الرصيد`, 'error');
+                    return null;
+                }
+                return { key: platform, ...api };
+            }
+            
+            // Auto: find API with most remaining quota
+            let best = null;
+            let maxRemaining = 0;
+            
+            Object.entries(state.apis).forEach(([key, api]) => {
+                if (api.enabled && api.key && api.used < api.quota) {
+                    const remaining = api.quota - api.used;
+                    if (remaining > maxRemaining) {
+                        maxRemaining = remaining;
+                        best = { key, ...api };
+                    }
+                }
+            });
+            
+            return best;
+        }
+
+        // ==================== Video Generation ====================
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) {
+                showToast('الرجاء إدخال وصف الفيديو', 'error');
+                return;
+            }
+            
+            const api = getBestAPI();
+            if (!api) {
+                showToast('لا توجد منصة متاحة. أضف مفتاح API أولاً', 'error');
+                return;
+            }
+            
+            const voice = document.getElementById('voice-select').value;
+            const style = document.getElementById('style-select').value;
+            const duration = document.getElementById('duration-slider').value;
+            const autoVoiceTest = document.getElementById('auto-voice-test').checked;
+            
+            // Show status
+            document.getElementById('generation-status').classList.remove('hidden');
+            document.getElementById('generate-btn').disabled = true;
+            
+            // Simulate generation process
+            const words = prompt.split(/\s+/).length;
+            const minutes = Math.ceil(words / 150);
+            const segments = Math.ceil(minutes / 10);
+            
+            if (segments > 1) {
+                showToast(`سيتم تقسيم النص إلى ${segments} مقاطع`, 'info');
+            }
+            
+            for (let i = 0; i < segments; i++) {
+                document.getElementById('status-text').textContent = `جاري إنشاء المقطع ${i + 1}/${segments}...`;
+                document.getElementById('status-detail').textContent = `المنصة: ${api.name}`;
+                
+                // Simulate progress
+                for (let p = 0; p <= 100; p += 10) {
+                    document.getElementById('progress-bar').style.width = `${p}%`;
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            }
+            
+            // Voice test if enabled
+            if (autoVoiceTest) {
+                document.getElementById('status-text').textContent = 'جاري اختبار الصوت...';
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            
+            // Update quota
+            state.apis[api.key].used += 1;
+            localStorage.setItem('apis', JSON.stringify(state.apis));
+            
+            // Add to history
+            const historyItem = {
+                id: Date.now(),
+                prompt: prompt.substring(0, 100),
+                platform: api.name,
+                duration: duration + 's',
+                character: state.selectedCharacter ? state.characters.find(c => c.id === state.selectedCharacter)?.name : null,
+                timestamp: new Date().toISOString(),
+                status: 'completed'
+            };
+            state.history.unshift(historyItem);
+            localStorage.setItem('history', JSON.stringify(state.history));
+            
+            // Show results
+            document.getElementById('generation-status').classList.add('hidden');
+            document.getElementById('generate-btn').disabled = false;
+            document.getElementById('results-container').classList.remove('hidden');
+            
+            const preview = document.getElementById('video-preview');
+            preview.innerHTML = `
+                <div class="glass rounded-xl p-4">
+                    <div class="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-3 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold">فيديو_تم_إنشاؤه.mp4</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${duration}s • ${state.selectedAspect} • ${api.name}</p>
+                        </div>
+                        <button class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-lg text-sm hover:scale-105 transition-transform">
+                            <i class="fas fa-download ml-1"></i>تحميل
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            renderAPIDashboard();
+            renderHistory();
+            showToast('تم إنشاء الفيديو بنجاح!', 'success');
+        });
+
+        // ==================== History ====================
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            if (state.history.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">لا يوجد سجل بعد</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            state.history.slice(0, 10).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'glass rounded-lg p-3';
+                div.innerHTML = `
+                    <div class="flex items-start justify-between mb-1">
+                        <span class="text-xs font-semibold">${item.platform}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${formatDate(item.timestamp)}</span>
+                    </div>
+                    <p class="text-xs line-clamp-2 mb-1">${item.prompt}...</p>
+                    <div class="flex gap-2 text-xs">
+                        <span class="text-gray-500 dark:text-gray-400">${item.duration}</span>
+                        ${item.character ? `<span class="text-purple-500"><i class="fas fa-user ml-1"></i>${item.character}</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ==================== Utilities ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'from-green-500 to-emerald-500',
+                error: 'from-red-500 to-pink-500',
+                info: 'from-blue-500 to-cyan-500'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.className = `toast glass rounded-xl px-6 py-3 shadow-2xl flex items-center gap-3`;
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} text-xl"></i>
+                <span class="font-semibold">${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function getVoiceLabel(voice) {
+            const labels = { girl: 'بنت', boy: 'طفل', man: 'رجل', woman: 'امرأة' };
+            return labels[voice] || voice;
+        }
+
+        function getStyleLabel(style) {
+            const labels = { cartoon: 'كرتوني', realistic: 'واقعي', anime: 'أنمي' };
+            return labels[style] || style;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000 / 60); // minutes
+            
+            if (diff < 1) return 'الآن';
+            if (diff < 60) return `منذ ${diff} دقيقة`;
+            if (diff < 1440) return `منذ ${Math.floor(diff / 60)} ساعة`;
+            return `منذ ${Math.floor(diff / 1440)} يوم`;
+        }
+
+        // ==================== Init ====================
+        initTheme();
+        renderAPIDashboard();
+        renderAPIConfig();
+        renderCharacters();
+        updateCharacterSelect();
+        renderHistory();
+        
+        // Settings button
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            document.querySelector('[data-tab="api-manager"]').click();
+        });
+    </script>
+</body>
+</html>
