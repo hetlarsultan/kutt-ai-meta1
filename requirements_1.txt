@@ -1,0 +1,14 @@
+gradio==4.36.1
+torch
+torchvision
+torchaudio
+gtts
+TTS==0.22.0
+gfpgan
+realesrgan
+face-alignment
+librosa
+soundfile
+flask
+flask-cors
+elevenlabs
