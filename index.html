@@ -3,768 +3,1028 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KuttAI - مولد الفيديوهات الذكي</title>
+<title>مولد الفيديو متعدد المنصات | Multi-Platform Video Generator</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
 :root {
-  --bg-color: #e0e5ec;
-  --shadow-light: #ffffff;
-  --shadow-dark: #a3b1c6;
-  --primary: #5b72ee;
-  --primary-dark: #4659d4;
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
-  --success: #48bb78;
-  --danger: #f56565;
+    --bg-primary: #e6e7ee;
+    --bg-secondary: #dde1eb;
+    --text-primary: #31344b;
+    --text-secondary: #5a5d72;
+    --shadow-light: #ffffff;
+    --shadow-dark: #c8ccdb;
+    --accent: #6c63ff;
+    --success: #00c896;
+    --warning: #ff9f1c;
+    --danger: #ff3d71;
+    --meta-blue: #0866ff;
+}
+.dark {
+    --bg-primary: #2a2d3a;
+    --bg-secondary: #232530;
+    --text-primary: #e4e6eb;
+    --text-secondary: #b0b3b8;
+    --shadow-light: #343746;
+    --shadow-dark: #1e2028;
+    --accent: #8b84ff;
+    --success: #00e6a8;
+    --warning: #ffb347;
+    --danger: #ff5c85;
+    --meta-blue: #3b82f6;
 }
 * {
-  font-family: 'Tajawal', sans-serif;
+    font-family: 'Tajawal', sans-serif;
 }
 body {
-  background: var(--bg-color);
-  color: var(--text-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
 }
-.neumorphism {
-  background: var(--bg-color);
-  box-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
-  border-radius: 20px;
+.neumorphic {
+    background: var(--bg-primary);
+    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    border-radius: 20px;
 }
-.neumorphism-inset {
-  background: var(--bg-color);
-  box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
-  border-radius: 15px;
+.neumorphic-inset {
+    background: var(--bg-primary);
+    box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+    border-radius: 15px;
 }
-.neumorphism-btn {
-  background: var(--bg-color);
-  box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  cursor: pointer;
+.neumorphic-btn {
+    background: var(--bg-primary);
+    box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
-.neumorphism-btn:active {
-  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+.neumorphic-btn:hover {
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    transform: translateY(-1px);
 }
-.neumorphism-btn:hover {
-  transform: translateY(-2px);
+.neumorphic-btn:active {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    transform: translateY(0);
 }
-.neumorphism-active {
-  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+.neumorphic-btn.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.1);
 }
-input, textarea, select {
-  background: var(--bg-color) !important;
-  border: none !important;
-  outline: none !important;
+.tab-btn {
+    position: relative;
+    overflow: hidden;
 }
-input:focus, textarea:focus, select:focus {
-  box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light) !important;
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.3s ease;
 }
-.tab-content {
-  display: none;
-  animation: fadeIn 0.4s ease;
+.tab-btn.active::after {
+    width: 100%;
 }
-.tab-content.active {
-  display: block;
+.gradient-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.gradient-meta {
+    background: linear-gradient(135deg, var(--meta-blue) 0%, #8b5cf6 100%);
 }
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary) 0%, #9f7aea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.character-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.character-card:hover {
-  transform: scale(1.05);
-}
-.character-card.selected {
-  box-shadow: 0 0 0 3px var(--primary), 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
-}
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.7);
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s ease;
-}
-.modal.show {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  max-width: 90%;
-  max-height: 90%;
-  animation: scaleIn 0.3s ease;
-}
-@keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  z-index: 2000;
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-.loading-spinner {
-  border: 3px solid var(--shadow-dark);
-  border-top: 3px solid var(--primary);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
+.spinner {
+    border: 3px solid var(--bg-secondary);
+    border-top: 3px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
-@media (max-width: 768px) {
-  .neumorphism {
-    border-radius: 16px;
-  }
+.fade-in {
+    animation: fadeIn 0.4s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+select, textarea, input {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--shadow-dark);
+    border-radius: 10px;
+}
+.badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+.code-block {
+    font-family: 'Courier New', monospace;
+    direction: ltr;
+    text-align: left;
 }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
-
 <div class="max-w-7xl mx-auto">
-  <!-- Header -->
-  <div class="neumorphism p-6 md:p-8 mb-6">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <div class="neumorphism-btn p-4 rounded-2xl">
-          <i data-lucide="video" class="w-8 h-8 text-[var(--primary)]"></i>
-        </div>
-        <div>
-          <h1 class="text-3xl md:text-4xl font-extrabold gradient-text">KuttAI</h1>
-          <p class="text-sm text-[var(--text-secondary)] mt-1">مولد الفيديوهات الذكي باللهجات العربية</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <div class="neumorphism-inset px-4 py-2 rounded-xl flex items-center gap-2">
-          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span class="text-sm font-medium">Meta AI Smart</span>
-        </div>
-        <div class="neumorphism-inset px-4 py-2 rounded-xl flex items-center gap-2">
-          <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
-          <span class="text-sm font-medium">SadTalker</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabs Navigation -->
-  <div class="neumorphism p-3 mb-6">
-    <div class="flex gap-3 flex-wrap">
-      <button onclick="switchTab('create')" class="tab-btn neumorphism-btn px-6 py-3 rounded-xl font-semibold flex items-center gap-2 neumorphism-active" data-tab="create">
-        <i data-lucide="sparkles" class="w-5 h-5"></i>
-        إنشاء فيديو
-      </button>
-      <button onclick="switchTab('library')" class="tab-btn neumorphism-btn px-6 py-3 rounded-xl font-semibold flex items-center gap-2" data-tab="library">
-        <i data-lucide="film" class="w-5 h-5"></i>
-        مكتبة الفيديوهات
-        <span id="libraryCount" class="neumorphism-inset px-2 py-0.5 rounded-lg text-xs">0</span>
-      </button>
-      <button onclick="switchTab('characters')" class="tab-btn neumorphism-btn px-6 py-3 rounded-xl font-semibold flex items-center gap-2" data-tab="characters">
-        <i data-lucide="users" class="w-5 h-5"></i>
-        مكتبة الشخصيات
-      </button>
-    </div>
-  </div>
-
-  <!-- Tab: Create Video -->
-  <div id="tab-create" class="tab-content active">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Left: Form -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Video Info -->
-        <div class="neumorphism p-6">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i data-lucide="file-text" class="w-6 h-6 text-[var(--primary)]"></i>
-            معلومات الفيديو
-          </h3>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">عنوان الفيديو</label>
-              <input type="text" id="videoTitle" class="neumorphism-inset w-full p-4 rounded-xl" placeholder="مثال: إعلان منتج جديد">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">النص / السكريبت</label>
-              <textarea id="videoScript" rows="5" class="neumorphism-inset w-full p-4 rounded-xl resize-none" placeholder="اكتب النص الذي تريد أن تقوله الشخصية..."></textarea>
-              <div class="flex justify-between mt-2 text-xs text-[var(--text-secondary)]">
-                <span id="charCount">0 حرف</span>
-                <button onclick="generateScriptWithAI()" class="text-[var(--primary)] hover:underline flex items-center gap-1">
-                  <i data-lucide="wand-2" class="w-3 h-3"></i>
-                  توليد بالذكاء الاصطناعي
+    <!-- Header -->
+    <header class="neumorphic p-6 mb-6 fade-in">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl gradient-accent flex items-center justify-center">
+                    <i class="fas fa-film text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black">مولد الفيديو المتعدد</h1>
+                    <p class="text-sm text-[var(--text-secondary)]">7 منصات + وضع محلي + شخصيات مخصصة</p>
+                </div>
+            <div class="flex items-center gap-3">
+                <button id="toggleLocal" class="neumorphic-btn px-6 py-3 rounded-xl flex items-center gap-2">
+                    <i class="fas fa-server"></i>
+                    <span>الوضع المحلي</span>
+                    <span id="localStatus" class="w-2 h-2 rounded-full bg-gray-400"></span>
                 </button>
-              </div>
+                <button id="themeToggle" class="neumorphic-btn p-4 rounded-xl">
+                    <i class="fas fa-moon text-lg"></i>
+                </button>
             </div>
-          </div>
         </div>
+    </header>
 
-        <!-- Settings -->
-        <div class="neumorphism p-6">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i data-lucide="settings" class="w-6 h-6 text-[var(--primary)]"></i>
-            إعدادات الفيديو
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Dialect -->
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">اللهجة</label>
-              <select id="dialect" class="neumorphism-inset w-full p-4 rounded-xl">
-                <option value="gulf">خليجية 🇸🇦</option>
-                <option value="egyptian">مصرية 🇪🇬</option>
-                <option value="levantine">شامية 🇱🇧</option>
-                <option value="moroccan">مغربية 🇲🇦</option>
-                <option value="standard">فصحى 📚</option>
-              </select>
+    <!-- Local Mode Warning Banner -->
+    <div id="localWarning" class="neumorphic p-4 mb-6 hidden bg-gradient-to-r from-orange-500/10 to-red-500/10 fade-in">
+        <div class="flex items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-[var(--warning)] text-xl mt-1"></i>
+            <div class="flex-1">
+                <h3 class="font-bold text-[var(--warning)] mb-1">تنبيه: الوضع المحلي</h3>
+                <p class="text-sm text-[var(--text-secondary)]">الوضع المحلي يحتاج 16GB RAM وكرت RTX 3060 على الأقل للعمل بسلاسة. تأكد من تشغيل Docker و Ollama قبل الاستخدام.</p>
             </div>
-            <!-- Voice -->
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">الصوت</label>
-              <select id="voice" class="neumorphism-inset w-full p-4 rounded-xl">
-                <option value="male1">رجل - خالد</option>
-                <option value="male2">رجل - عبدالله</option>
-                <option value="male3">رجل - محمد</option>
-                <option value="female1">امرأة - نورة</option>
-                <option value="female2">امرأة - سارة</option>
-                <option value="female3">امرأة - فاطمة</option>
-              </select>
-            </div>
-            <!-- API Selection -->
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">محرك التوليد</label>
-              <select id="apiEngine" class="neumorphism-inset w-full p-4 rounded-xl">
-                <option value="meta-ai">Meta AI Smart (موصى به)</option>
-                <option value="sadtalker">SadTalker Pro</option>
-                <option value="wav2lip">Wav2Lip HD</option>
-                <option value="d_id">D-ID Studio</option>
-                <option value="heygen">HeyGen API</option>
-              </select>
-            </div>
-            <!-- Quality -->
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">الجودة</label>
-              <select id="quality" class="neumorphism-inset w-full p-4 rounded-xl">
-                <option value="720p">720p HD</option>
-                <option value="1080p" selected>1080p Full HD</option>
-                <option value="4k">4K Ultra HD</option>
-              </select>
-            </div>
-          </div>
         </div>
-
-        <!-- Generate Button -->
-        <button onclick="generateVideo()" id="generateBtn" class="neumorphism-btn w-full p-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 bg-gradient-to-l from-[var(--primary)] to-[var(--primary-dark)] text-white">
-          <i data-lucide="play-circle" class="w-6 h-6"></i>
-          توليد الفيديو الآن
-        </button>
-      </div>
-
-      <!-- Right: Character Selection -->
-      <div class="space-y-6">
-        <div class="neumorphism p-6">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i data-lucide="user-circle" class="w-6 h-6 text-[var(--primary)]"></i>
-            اختر الشخصية
-          </h3>
-          <div class="grid grid-cols-2 gap-3" id="characterGrid">
-            <!-- Characters will be loaded here -->
-          </div>
-        </div>
-
-        <!-- Preview Selected -->
-        <div class="neumorphism p-6">
-          <h3 class="text-lg font-bold mb-4">الشخصية المختارة</h3>
-          <div id="selectedCharacter" class="neumorphism-inset p-4 rounded-xl">
-            <div class="text-center text-[var(--text-secondary)]">
-              <i data-lucide="user-plus" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-              <p class="text-sm">لم تختر شخصية بعد</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Results Section -->
-    <div id="resultsSection" class="mt-6 hidden">
-      <div class="neumorphism p-6">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>
-          النتائج
-        </h3>
-        <div id="resultsContainer" class="space-y-4">
-          <!-- Results will appear here -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Panel -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Generation Mode Tabs -->
+            <div class="neumorphic p-6 fade-in">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-rocket text-[var(--accent)]"></i>
+                    اختر منصة التوليد
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <button class="generation-tab tab-btn neumorphic-btn p-4 rounded-xl active" data-mode="api">
+                        <i class="fas fa-cloud text-xl mb-2"></i>
+                        <div class="text-sm font-bold">واجهات API</div>
+                        <div class="badge bg-green-500/20 text-green-600 mt-1">5 منصات</div>
+                    </button>
+                    <button class="generation-tab tab-btn neumorphic-btn p-4 rounded-xl" data-mode="meta">
+                        <i class="fab fa-meta text-xl mb-2"></i>
+                        <div class="text-sm font-bold">Meta AI</div>
+                        <div class="badge bg-blue-500/20 text-blue-600 mt-1">ذكي</div>
+                    </button>
+                    <button class="generation-tab tab-btn neumorphic-btn p-4 rounded-xl" data-mode="local">
+                        <i class="fas fa-microchip text-xl mb-2"></i>
+                        <div class="text-sm font-bold">محلي</div>
+                        <div class="badge bg-purple-500/20 text-purple-600 mt-1">Llama+MusicGen</div>
+                    </button>
+                    <button class="generation-tab tab-btn neumorphic-btn p-4 rounded-xl" data-mode="character">
+                        <i class="fas fa-user-circle text-xl mb-2"></i>
+                        <div class="text-sm font-bold">المكتبة</div>
+                        <div class="badge bg-pink-500/20 text-pink-600 mt-1">شخصيات</div>
+                    </button>
+                </div>
+
+                <!-- API Mode Content -->
+                <div id="apiMode" class="mode-content">
+                    <label class="block text-sm font-bold mb-3">اختر المزود:</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <button class="api-provider neumorphic-btn p-3 rounded-xl text-sm active" data-provider="runway">
+                            <img src="https://api.iconify.design/simple-icons:runway.svg" class="w-5 h-5 inline ml-1" alt="">
+                            Runway ML
+                        </button>
+                        <button class="api-provider neumorphic-btn p-3 rounded-xl text-sm" data-provider="pika">
+                            <i class="fas fa-bolt ml-1"></i>
+                            Pika Labs
+                        </button>
+                        <button class="api-provider neumorphic-btn p-3 rounded-xl text-sm" data-provider="stable">
+                            <i class="fas fa-wand-magic-sparkles ml-1"></i>
+                            Stable Video
+                        </button>
+                        <button class="api-provider neumorphic-btn p-3 rounded-xl text-sm" data-provider="leonardo">
+                            <i class="fas fa-paintbrush ml-1"></i>
+                            Leonardo
+                        </button>
+                        <button class="api-provider neumorphic-btn p-3 rounded-xl text-sm" data-provider="luma">
+                            <i class="fas fa-video ml-1"></i>
+                            Luma Dream
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Meta AI Mode Content -->
+                <div id="metaMode" class="mode-content hidden">
+                    <div class="neumorphic-inset p-4 mb-4">
+                        <div class="flex items-start gap-3 mb-3">
+                            <i class="fab fa-meta text-2xl text-[var(--meta-blue)]"></i>
+                            <div>
+                                <h3 class="font-bold text-[var(--meta-blue)]">Meta AI - الوضع الذكي</h3>
+                                <p class="text-xs text-[var(--text-secondary)] mt-1">يحسّن مطالبتك تلقائياً لـ Muse Spark ثم تنسخها لـ Meta AI</p>
+                            </div>
+                        </div>
+                        <ol class="text-sm space-y-2 text-[var(--text-secondary)] list-decimal mr-5">
+                            <li>اكتب وصف الفيديو في الحقل أدناه</li>
+                            <li>اضغط "تحسين المطالبة" للحصول على نسخة محسّنة</li>
+                            <li>انسخ المطالبة والصقها في Meta AI</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Local Mode Content -->
+                <div id="localMode" class="mode-content hidden">
+                    <div class="neumorphic-inset p-4 mb-4">
+                        <div class="flex items-start gap-3 mb-3">
+                            <i class="fas fa-server text-2xl text-purple-500"></i>
+                            <div>
+                                <h3 class="font-bold text-purple-500">التوليد المحلي - Llama3 + MusicGen</h3>
+                                <p class="text-xs text-[var(--text-secondary)] mt-1">يستخدم جهازك للمعالجة - مجاني تماماً</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <div class="text-center p-2 rounded-lg bg-[var(--bg-secondary)]">
+                                <div class="text-xs text-[var(--text-secondary)]">Ollama</div>
+                                <div id="ollamaStatus" class="text-xs font-bold text-gray-400">غير متصل</div>
+                            </div>
+                            <div class="text-center p-2 rounded-lg bg-[var(--bg-secondary)]">
+                                <div class="text-xs text-[var(--text-secondary)]">MusicGen</div>
+                                <div id="musicgenStatus" class="text-xs font-bold text-gray-400">غير متصل</div>
+                            </div>
+                            <div class="text-center p-2 rounded-lg bg-[var(--bg-secondary)]">
+                                <div class="text-xs text-[var(--text-secondary)]">الفيديو</div>
+                                <div id="videoStatus" class="text-xs font-bold text-orange-400">Web API</div>
+                            </div>
+                        </div>
+                        <button id="showSetupBtn" class="neumorphic-btn w-full py-2 rounded-lg text-sm">
+                            <i class="fas fa-cog ml-1"></i>
+                            إظهار تعليمات التشغيل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Character Library Mode -->
+                <div id="characterMode" class="mode-content hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-sm font-bold">مكتبة الشخصيات:</label>
+                        <button id="addCharacterBtn" class="neumorphic-btn px-3 py-1 rounded-lg text-sm">
+                            <i class="fas fa-plus ml-1"></i>
+                            إضافة
+                        </button>
+                    </div>
+                    <div id="characterList" class="space-y-2 max-h-64 overflow-y-auto">
+                        <div class="neumorphic-inset p-3 text-center text-sm text-[var(--text-secondary)]">
+                            لا توجد شخصيات محفوظة. اضغط "إضافة" لحفظ أول شخصية.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Input -->
+            <div class="neumorphic p-6 fade-in">
+                <label class="block text-lg font-bold mb-3 flex items-center gap-2">
+                    <i class="fas fa-pen-to-square text-[var(--accent)]"></i>
+                    وصف الفيديو
+                </label>
+                <textarea id="promptInput" rows="5" class="neumorphic-inset w-full p-4 rounded-xl focus:outline-none resize-none" placeholder="مثال: رائد فضاء يمشي على المريخ مع غروب شمسي أحمر، لقطة سينمائية، 4K، إضاءة درامية..."></textarea>
+                
+                <!-- Enhanced Prompt Output for Meta AI -->
+                <div id="enhancedPromptBox" class="hidden mt-4">
+                    <label class="block text-sm font-bold mb-2 text-[var(--meta-blue)]">المطالبة المحسّنة لـ Muse:</label>
+                    <div class="neumorphic-inset p-4 rounded-xl relative">
+                        <pre id="enhancedPromptText" class="text-sm whitespace-pre-wrap"></pre>
+                        <button id="copyEnhancedBtn" class="absolute top-2 left-2 neumorphic-btn p-2 rounded-lg">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="flex gap-3 mt-3">
+                        <button id="openMetaBtn" class="flex-1 gradient-meta text-white py-3 rounded-xl font-bold neumorphic-btn">
+                            <i class="fab fa-meta ml-2"></i>
+                            فتح Meta AI
+                        </button>
+                        <button id="regenerateEnhanceBtn" class="neumorphic-btn px-6 py-3 rounded-xl">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                    <select id="duration" class="neumorphic-inset px-4 py-3 rounded-xl focus:outline-none">
+                        <option value="3">3 ثواني</option>
+                        <option value="5" selected>5 ثواني</option>
+                        <option value="10">10 ثواني</option>
+                        <option value="15">15 ثانية</option>
+                    </select>
+                    <select id="aspectRatio" class="neumorphic-inset px-4 py-3 rounded-xl focus:outline-none">
+                        <option value="16:9">16:9 أفقي</option>
+                        <option value="9:16">9:16 عمودي</option>
+                        <option value="1:1" selected>1:1 مربع</option>
+                        <option value="4:3">4:3 كلاسيك</option>
+                    </select>
+                    <select id="style" class="neumorphic-inset px-4 py-3 rounded-xl focus:outline-none">
+                        <option value="cinematic">سينمائي</option>
+                        <option value="realistic">واقعي</option>
+                        <option value="anime">أنمي</option>
+                        <option value="3d">3D</option>
+                        <option value="watercolor">ألوان مائية</option>
+                    </select>
+                    <select id="motion" class="neumorphic-inset px-4 py-3 rounded-xl focus:outline-none">
+                        <option value="medium">حركة متوسطة</option>
+                        <option value="low">حركة بسيطة</option>
+                        <option value="high">حركة ديناميكية</option>
+                        <option value="static">ثابت</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="neumorphic p-6 fade-in">
+                <button id="generateBtn" class="w-full gradient-accent text-white py-5 rounded-2xl font-black text-xl neumorphic-btn flex items-center justify-center gap-3">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <span>توليد الفيديو</span>
+                </button>
+                <div id="progressBar" class="hidden mt-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span id="progressText">جاري التوليد...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="neumorphic-inset h-3 rounded-full overflow-hidden">
+                        <div id="progressFill" class="h-full gradient-accent transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup Instructions Modal -->
+            <div id="setupModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="neumorphic max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-black">تعليمات التشغيل المحلي</h2>
+                        <button id="closeSetupBtn" class="neumorphic-btn p-2 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4 text-sm">
+                        <div class="neumorphic-inset p-4">
+                            <h3 class="font-bold mb-2 text-[var(--accent)]">1. المتطلبات</h3>
+                            <ul class="list-disc mr-5 space-y-1 text-[var(--text-secondary)]">
+                                <li>Docker و Docker Compose</li>
+                                <li>16GB RAM كحد أدنى (32GB موصى به)</li>
+                                <li>كرت شاشة NVIDIA RTX 3060 أو أعلى مع 8GB VRAM</li>
+                                <li>50GB مساحة تخزين فارغة</li>
+                            </ul>
+                        </div>
+                        <div class="neumorphic-inset p-4">
+                            <h3 class="font-bold mb-2 text-[var(--accent)]">2. ملف docker-compose.yml</h3>
+                            <div class="bg-black/80 text-green-400 p-3 rounded-lg code-block text-xs overflow-x-auto">
+<pre># docker-compose.yml
+version: '3.8'
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  musicgen:
+    image: ghcr.io/facebookresearch/audiocraft:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models
+    command: python -m audiocraft.app --share
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  ollama:</pre>
+                            </div>
+                            <button class="copy-code neumorphic-btn mt-2 px-4 py-2 rounded-lg text-xs w-full">
+                                <i class="fas fa-copy ml-1"></i>
+                                نسخ الكود
+                            </button>
+                        </div>
+                        <div class="neumorphic-inset p-4">
+                            <h3 class="font-bold mb-2 text-[var(--accent)]">3. خطوات التشغيل</h3>
+                            <ol class="list-decimal mr-5 space-y-2 text-[var(--text-secondary)] code-block">
+                                <li>docker-compose up -d</li>
+                                <li>docker exec -it ollama ollama pull llama3</li>
+                                <li>تأكد أن المنافذ 11434 و 8080 مفتوحة</li>
+                                <li>ارجع هنا واضغط "فحص الاتصال"</li>
+                            </ol>
+                        </div>
+                        <button id="checkConnectionBtn" class="gradient-accent text-white w-full py-3 rounded-xl font-bold neumorphic-btn">
+                            <i class="fas fa-plug ml-2"></i>
+                            فحص الاتصال
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" class="neumorphic p-6 hidden fade-in">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-check-circle text-[var(--success)]"></i>
+                    النتيجة
+                </h2>
+                <div id="videoPreview" class="neumorphic-inset rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center mb-4">
+                    <div class="text-center text-white/50">
+                        <i class="fas fa-video text-6xl mb-3"></i>
+                        <p>الفيديو سيظهر هنا</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button id="downloadBtn" class="flex-1 neumorphic-btn py-3 rounded-xl font-bold">
+                        <i class="fas fa-download ml-2"></i>
+                        تحميل
+                    </button>
+                    <button id="shareBtn" class="neumorphic-btn px-6 py-3 rounded-xl">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Tab: Video Library -->
-  <div id="tab-library" class="tab-content">
-    <div class="neumorphism p-6">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold flex items-center gap-2">
-          <i data-lucide="film" class="w-6 h-6 text-[var(--primary)]"></i>
-          مكتبة الفيديوهات المحفوظة
-        </h3>
-        <button onclick="clearLibrary()" class="neumorphism-btn px-4 py-2 rounded-xl text-sm flex items-center gap-2 text-[var(--danger)]">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          مسح الكل
-        </button>
-      </div>
-      <div id="libraryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="neumorphism-inset p-12 rounded-xl text-center text-[var(--text-secondary)] col-span-full">
-          <i data-lucide="folder-open" class="w-16 h-16 mx-auto mb-3 opacity-50"></i>
-          <p>لا توجد فيديوهات محفوظة بعد</p>
-          <p class="text-sm mt-2">قم بتوليد وحفظ الفيديوهات لتظهر هنا</p>
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Settings -->
+            <div class="neumorphic p-6 fade-in">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-sliders text-[var(--accent)]"></i>
+                    إعدادات سريعة
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-bold mb-2 block">مستوى الإبداع</label>
+                        <input type="range" id="creativity" min="1" max="10" value="7" class="w-full">
+                        <div class="flex justify-between text-xs text-[var(--text-secondary)]">
+                            <span>محافظ</span>
+                            <span id="creativityVal">7</span>
+                            <span>إبداعي</span>
+                        </div>
+                    <div>
+                        <label class="text-sm font-bold mb-2 block">جودة الإخراج</label>
+                        <select id="quality" class="neumorphic-inset w-full px-4 py-2 rounded-xl focus:outline-none">
+                            <option value="480p">480p سريع</option>
+                            <option value="720p" selected>720p متوازن</option>
+                            <option value="1080p">1080p عالي</option>
+                            <option value="4k">4K فائق</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="neumorphic p-6 fade-in">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-[var(--accent)]"></i>
+                    الإحصائيات
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-[var(--text-secondary)]">فيديوهات منتجة</span>
+                        <span id="videoCount" class="font-bold text-xl">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-[var(--text-secondary)]">شخصيات محفوظة</span>
+                        <span id="charCount" class="font-bold text-xl">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-[var(--text-secondary)]">الوقت المقدر</span>
+                        <span id="etaTime" class="font-bold text-xl">~2 د</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent History -->
+            <div class="neumorphic p-6 fade-in">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-history text-[var(--accent)]"></i>
+                    السجل الحديث
+                </h3>
+                <div id="historyList" class="space-y-2 max-h-64 overflow-y-auto">
+                    <div class="text-sm text-[var(--text-secondary)] text-center py-4">لا يوجد سجل بعد</div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Tab: Characters Library -->
-  <div id="tab-characters" class="tab-content">
-    <div class="neumorphism p-6">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold flex items-center gap-2">
-          <i data-lucide="users" class="w-6 h-6 text-[var(--primary)]"></i>
-          مكتبة الشخصيات
-        </h3>
-        <button onclick="showUploadModal()" class="neumorphism-btn px-4 py-2 rounded-xl text-sm flex items-center gap-2">
-          <i data-lucide="upload" class="w-4 h-4"></i>
-          رفع شخصية جديدة
-        </button>
-      </div>
-      <div id="charactersLibrary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <!-- Characters will be loaded here -->
-      </div>
+    <!-- Add Character Modal -->
+    <div id="characterModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="neumorphic max-w-lg w-full p-6">
+            <h2 class="text-xl font-black mb-4">إضافة شخصية جديدة</h2>
+            <div class="space-y-4">
+                <input id="charName" type="text" placeholder="اسم الشخصية" class="neumorphic-inset w-full px-4 py-3 rounded-xl focus:outline-none">
+                <textarea id="charDesc" rows="4" placeholder="وصف الشخصية: العمر، الملابس، الملامح، الأسلوب..." class="neumorphic-inset w-full px-4 py-3 rounded-xl focus:outline-none resize-none"></textarea>
+                <input id="charTags" type="text" placeholder="كلمات مفتاحية: سينمائي, واقعي, أنمي..." class="neumorphic-inset w-full px-4 py-3 rounded-xl focus:outline-none">
+                <div class="flex gap-3">
+                    <button id="saveCharacterBtn" class="flex-1 gradient-accent text-white py-3 rounded-xl font-bold neumorphic-btn">حفظ</button>
+                    <button id="cancelCharacterBtn" class="neumorphic-btn px-6 py-3 rounded-xl">إلغاء</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
-<!-- Video Preview Modal -->
-<div id="videoModal" class="modal">
-  <div class="modal-content neumorphism p-4 rounded-2xl w-full max-w-4xl mx-4">
-    <div class="flex items-center justify-between mb-4">
-      <h3 id="modalVideoTitle" class="text-xl font-bold"></h3>
-      <button onclick="closeVideoModal()" class="neumorphism-btn p-2 rounded-xl">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-    </div>
-    <div class="neumorphism-inset rounded-xl overflow-hidden">
-      <video id="modalVideo" controls class="w-full" style="max-height: 70vh;">
-        <source src="" type="video/mp4">
-        متصفحك لا يدعم تشغيل الفيديو
-      </video>
-    </div>
-  </div>
-</div>
-
-<!-- Toast Notification -->
-<div id="toast" class="toast neumorphism px-6 py-4 rounded-xl flex items-center gap-3">
-  <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5"></i>
-  <span id="toastMessage"></span>
 </div>
 
 <script>
-// Initialize Lucide Icons
-lucide.createIcons();
+const state = {
+    currentMode: 'api',
+    currentProvider: 'runway',
+    localModeEnabled: false,
+    isGenerating: false,
+    videoCount: 0,
+    characters: JSON.parse(localStorage.getItem('characters') || '[]'),
+    history: JSON.parse(localStorage.getItem('history') || '[]'),
+    localServices: {
+        ollama: false,
+        musicgen: false
+    }
+};
 
-// Character Database
-const characters = [
-  { id: 1, name: 'ضياء صالح', avatar: 'https://i.pravatar.cc/300?img=12', gender: 'male', category: 'مذيع' },
-  { id: 2, name: 'سارة أحمد', avatar: 'https://i.pravatar.cc/300?img=5', gender: 'female', category: 'مقدمة' },
-  { id: 3, name: 'محمد العلي', avatar: 'https://i.pravatar.cc/300?img=33', gender: 'male', category: 'خبير' },
-  { id: 4, name: 'نورة الخالد', avatar: 'https://i.pravatar.cc/300?img=20', gender: 'female', category: 'معلمة' },
-  { id: 5, name: 'أحمد سالم', avatar: 'https://i.pravatar.cc/300?img=14', gender: 'male', category: 'مذيع' },
-  { id: 6, name: 'ليلى محمود', avatar: 'https://i.pravatar.cc/300?img=9', gender: 'female', category: 'خبيرة' },
-];
+const MUSE_SPARK_TEMPLATE = `You are Muse Spark, a cinematography expert. Transform this simple idea into a detailed video generation prompt.
 
-let selectedCharacterId = null;
-let db = null;
+Rules:
+1. Add cinematic details: camera angle, movement, lighting, mood
+2. Specify style, quality (4K, 8K), frame rate (24fps, 60fps)
+3. Include temporal description for motion over time
+4. Keep it concise but rich - max 150 words
+5. End with negative prompts
 
-// IndexedDB Setup
-const DB_NAME = 'KuttAI_DB';
-const DB_VERSION = 1;
-const STORE_NAME = 'videos';
+Input: {USER_PROMPT}
+Style: {STYLE}
+Duration: {DURATION}s
+Aspect: {ASPECT}
 
-function initDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+Output Format:
+Main Prompt: [Enhanced description]
+Negative: blurry, low quality, distorted, watermark, text`;
+
+function init() {
+    loadTheme();
+    updateStats();
+    renderCharacters();
+    renderHistory();
+    setupEventListeners();
+    checkLocalMode();
+}
+
+function setupEventListeners() {
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.getElementById('toggleLocal').addEventListener('click', toggleLocalMode);
     
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => {
-      db = request.result;
-      loadLibrary();
-      resolve(db);
-    };
+    document.querySelectorAll('.generation-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => switchMode(e.currentTarget.dataset.mode));
+    });
     
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-        objectStore.createIndex('date', 'date', { unique: false });
-      }
-    };
-  });
-}
-
-function saveVideoToDB(videoData) {
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.add(videoData);
+    document.querySelectorAll('.api-provider').forEach(btn => {
+        btn.addEventListener('click', (e) => selectProvider(e.currentTarget.dataset.provider));
+    });
     
-    request.onsuccess = () => {
-      showToast('تم حفظ الفيديو في المكتبة بنجاح', 'success');
-      loadLibrary();
-      resolve(request.result);
-    };
-    request.onerror = () => reject(request.error);
-  });
-}
-
-function getAllVideosFromDB() {
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
+    document.getElementById('generateBtn').addEventListener('click', handleGenerate);
+    document.getElementById('creativity').addEventListener('input', (e) => {
+        document.getElementById('creativityVal').textContent = e.target.value;
+    });
     
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-function deleteVideoFromDB(id) {
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.delete(id);
+    document.getElementById('openMetaBtn')?.addEventListener('click', () => {
+        window.open('https://meta.ai', '_blank');
+    });
     
-    request.onsuccess = () => {
-      showToast('تم حذف الفيديو', 'success');
-      loadLibrary();
-      resolve();
-    };
-    request.onerror = () => reject(request.error);
-  });
+    document.getElementById('copyEnhancedBtn')?.addEventListener('click', copyEnhancedPrompt);
+    document.getElementById('regenerateEnhanceBtn')?.addEventListener('click', enhancePromptForMeta);
+    
+    document.getElementById('showSetupBtn')?.addEventListener('click', () => {
+        document.getElementById('setupModal').classList.remove('hidden');
+    });
+    
+    document.getElementById('closeSetupBtn')?.addEventListener('click', () => {
+        document.getElementById('setupModal').classList.add('hidden');
+    });
+    
+    document.getElementById('checkConnectionBtn')?.addEventListener('click', checkLocalServices);
+    
+    document.getElementById('addCharacterBtn')?.addEventListener('click', () => {
+        document.getElementById('characterModal').classList.remove('hidden');
+    });
+    
+    document.getElementById('cancelCharacterBtn')?.addEventListener('click', () => {
+        document.getElementById('characterModal').classList.add('hidden');
+    });
+    
+    document.getElementById('saveCharacterBtn')?.addEventListener('click', saveCharacter);
+    
+    document.querySelectorAll('.copy-code').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const code = e.target.closest('.neumorphic-inset').querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            showToast('تم نسخ الكود', 'success');
+        });
+    });
 }
 
-// UI Functions
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('neumorphism-active'));
-  
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  document.querySelector(`[data-tab="${tabName}"]`).classList.add('neumorphism-active');
-  
-  if (tabName === 'library') loadLibrary();
-  if (tabName === 'characters') loadCharactersLibrary();
-  
-  lucide.createIcons();
+function switchMode(mode) {
+    state.currentMode = mode;
+    document.querySelectorAll('.generation-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+    
+    document.querySelectorAll('.mode-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById(`${mode}Mode`).classList.remove('hidden');
+    
+    if (mode === 'meta') {
+        document.getElementById('enhancedPromptBox').classList.add('hidden');
+    }
 }
 
-function loadCharacters() {
-  const grid = document.getElementById('characterGrid');
-  grid.innerHTML = characters.map(char => `
-    <div class="character-card neumorphism-btn p-3 rounded-xl text-center ${selectedCharacterId === char.id ? 'selected' : ''}" onclick="selectCharacter(${char.id})">
-      <img src="${char.avatar}" alt="${char.name}" class="w-full h-24 object-cover rounded-lg mb-2">
-      <p class="text-xs font-semibold">${char.name}</p>
-      <p class="text-xs text-[var(--text-secondary)]">${char.category}</p>
-    </div>
-  `).join('');
-  lucide.createIcons();
+function selectProvider(provider) {
+    state.currentProvider = provider;
+    document.querySelectorAll('.api-provider').forEach(p => p.classList.remove('active'));
+    document.querySelector(`[data-provider="${provider}"]`).classList.add('active');
 }
 
-function loadCharactersLibrary() {
-  const container = document.getElementById('charactersLibrary');
-  container.innerHTML = characters.map(char => `
-    <div class="neumorphism p-4 rounded-xl">
-      <img src="${char.avatar}" alt="${char.name}" class="w-full h-40 object-cover rounded-xl mb-3">
-      <h4 class="font-bold text-center">${char.name}</h4>
-      <p class="text-sm text-center text-[var(--text-secondary)] mb-3">${char.category}</p>
-      <button onclick="selectCharacterFromLibrary(${char.id})" class="neumorphism-btn w-full py-2 rounded-xl text-sm font-semibold">
-        اختيار
-      </button>
-    </div>
-  `).join('');
-  lucide.createIcons();
+function toggleLocalMode() {
+    state.localModeEnabled = !state.localModeEnabled;
+    const btn = document.getElementById('toggleLocal');
+    const status = document.getElementById('localStatus');
+    const warning = document.getElementById('localWarning');
+    
+    if (state.localModeEnabled) {
+        btn.classList.add('active');
+        status.classList.remove('bg-gray-400');
+        status.classList.add('bg-green-500', 'pulse');
+        warning.classList.remove('hidden');
+        showToast('تم تفعيل الوضع المحلي', 'success');
+        checkLocalServices();
+    } else {
+        btn.classList.remove('active');
+        status.classList.remove('bg-green-500', 'pulse');
+        status.classList.add('bg-gray-400');
+        warning.classList.add('hidden');
+    }
 }
 
-function selectCharacter(id) {
-  selectedCharacterId = id;
-  const char = characters.find(c => c.id === id);
-  loadCharacters();
-  
-  document.getElementById('selectedCharacter').innerHTML = `
-    <div class="flex items-center gap-3">
-      <img src="${char.avatar}" alt="${char.name}" class="w-16 h-16 rounded-xl object-cover">
-      <div>
-        <p class="font-bold">${char.name}</p>
-        <p class="text-sm text-[var(--text-secondary)]">${char.category}</p>
-        <p class="text-xs text-[var(--primary)] mt-1">
-          <i data-lucide="check-circle" class="w-3 h-3 inline"></i>
-          تم الاختيار
-        </p>
-      </div>
-    </div>
-  `;
-  lucide.createIcons();
+async function checkLocalMode() {
+    if (localStorage.getItem('localMode') === 'true') {
+        toggleLocalMode();
+    }
 }
 
-function selectCharacterFromLibrary(id) {
-  selectCharacter(id);
-  switchTab('create');
-  showToast('تم اختيار الشخصية', 'success');
+async function checkLocalServices() {
+    showToast('جاري فحص الاتصال...', 'info');
+    
+    try {
+        const ollamaRes = await fetch('http://localhost:11434/api/tags', { 
+            method: 'GET',
+            signal: AbortSignal.timeout(3000)
+        });
+        state.localServices.ollama = ollamaRes.ok;
+        document.getElementById('ollamaStatus').textContent = ollamaRes.ok ? 'متصل ✓' : 'غير متصل';
+        document.getElementById('ollamaStatus').className = `text-xs font-bold ${ollamaRes.ok ? 'text-green-500' : 'text-red-500'}`;
+    } catch (e) {
+        state.localServices.ollama = false;
+        document.getElementById('ollamaStatus').textContent = 'غير متصل';
+        document.getElementById('ollamaStatus').className = 'text-xs font-bold text-red-500';
+    }
+    
+    try {
+        const musicgenRes = await fetch('http://localhost:8080', { 
+            method: 'GET',
+            mode: 'no-cors',
+            signal: AbortSignal.timeout(3000)
+        });
+        state.localServices.musicgen = true;
+        document.getElementById('musicgenStatus').textContent = 'متصل ✓';
+        document.getElementById('musicgenStatus').className = 'text-xs font-bold text-green-500';
+    } catch (e) {
+        state.localServices.musicgen = false;
+        document.getElementById('musicgenStatus').textContent = 'غير متصل';
+        document.getElementById('musicgenStatus').className = 'text-xs font-bold text-red-500';
+    }
+    
+    if (state.localServices.ollama && state.localServices.musicgen) {
+        showToast('جميع الخدمات المحلية تعمل ✓', 'success');
+    } else {
+        showToast('بعض الخدمات غير متوفرة', 'warning');
+    }
 }
 
-function generateScriptWithAI() {
-  const examples = [
-    'مرحباً بكم في قناتنا، اليوم سنتحدث عن أهمية الذكاء الاصطناعي في حياتنا اليومية',
-    'هل تعلم أن التقنية غيرت كل شيء؟ تابعونا لمعرفة المزيد',
-    'في هذا الفيديو، سنشارككم أفضل النصائح لتحقيق النجاح',
-    'اكتشفوا معنا أحدث الابتكارات في عالم التكنولوجيا'
-  ];
-  document.getElementById('videoScript').value = examples[Math.floor(Math.random() * examples.length)];
-  updateCharCount();
-  showToast('تم توليد نص باستخدام Meta AI', 'success');
+async function enhancePromptForMeta() {
+    const userPrompt = document.getElementById('promptInput').value.trim();
+    if (!userPrompt) {
+        showToast('اكتب وصف الفيديو أولاً', 'warning');
+        return;
+    }
+    
+    showToast('جاري تحسين المطالبة...', 'info');
+    
+    const style = document.getElementById('style').value;
+    const duration = document.getElementById('duration').value;
+    const aspect = document.getElementById('aspectRatio').value;
+    
+    let enhanced = MUSE_SPARK_TEMPLATE
+        .replace('{USER_PROMPT}', userPrompt)
+        .replace('{STYLE}', style)
+        .replace('{DURATION}', duration)
+        .replace('{ASPECT}', aspect);
+    
+    if (state.localServices.ollama && state.localModeEnabled) {
+        try {
+            const res = await fetch('http://localhost:11434/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'llama3',
+                    prompt: enhanced,
+                    stream: false
+                })
+            });
+            const data = await res.json();
+            enhanced = data.response || enhanced;
+        } catch (e) {
+            console.log('Local enhancement failed, using template');
+        }
+    }
+    
+    document.getElementById('enhancedPromptText').textContent = enhanced;
+    document.getElementById('enhancedPromptBox').classList.remove('hidden');
+    showToast('تم تحسين المطالبة ✓', 'success');
 }
 
-function updateCharCount() {
-  const count = document.getElementById('videoScript').value.length;
-  document.getElementById('charCount').textContent = `${count} حرف`;
+function copyEnhancedPrompt() {
+    const text = document.getElementById('enhancedPromptText').textContent;
+    navigator.clipboard.writeText(text);
+    showToast('تم النسخ ✓', 'success');
 }
 
-document.getElementById('videoScript').addEventListener('input', updateCharCount);
-
-async function generateVideo() {
-  const title = document.getElementById('videoTitle').value.trim();
-  const script = document.getElementById('videoScript').value.trim();
-  
-  if (!title) {
-    showToast('يرجى إدخال عنوان الفيديو', 'error');
-    return;
-  }
-  if (!script) {
-    showToast('يرجى كتابة النص', 'error');
-    return;
-  }
-  if (!selectedCharacterId) {
-    showToast('يرجى اختيار شخصية', 'error');
-    return;
-  }
-  
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="loading-spinner w-6 h-6"></div><span>جاري التوليد...</span>';
-  
-  // Simulate API call - Replace with actual API
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  
-  const char = characters.find(c => c.id === selectedCharacterId);
-  const dialect = document.getElementById('dialect').value;
-  const voice = document.getElementById('voice').value;
-  const api = document.getElementById('apiEngine').value;
-  const quality = document.getElementById('quality').value;
-  
-  // Demo video URL - replace with actual generated video
-  const videoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-  const thumbnail = char.avatar;
-  
-  const resultHTML = `
-    <div class="neumorphism-inset p-4 rounded-xl">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="md:w-48 h-32 flex-shrink-0">
-          <img src="${thumbnail}" alt="Thumbnail" class="w-full h-full object-cover rounded-lg">
-        </div>
-        <div class="flex-1">
-          <h4 class="font-bold text-lg mb-2">${title}</h4>
-          <div class="text-sm text-[var(--text-secondary)] space-y-1 mb-3">
-            <p><i data-lucide="user" class="w-4 h-4 inline"></i> ${char.name}</p>
-            <p><i data-lucide="mic" class="w-4 h-4 inline"></i> ${document.getElementById('voice').selectedOptions[0].text}</p>
-            <p><i data-lucide="globe" class="w-4 h-4 inline"></i> ${document.getElementById('dialect').selectedOptions[0].text}</p>
-            <p><i data-lucide="cpu" class="w-4 h-4 inline"></i> ${document.getElementById('apiEngine').selectedOptions[0].text}</p>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button onclick="previewVideo('${videoUrl}', '${title}')" class="neumorphism-btn px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 bg-[var(--primary)] text-white">
-              <i data-lucide="eye" class="w-4 h-4"></i>
-              معاينة
-            </button>
-            <button onclick="downloadVideo('${videoUrl}', '${title}')" class="neumorphism-btn px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              تنزيل
-            </button>
-            <button onclick='saveToLibrary(${JSON.stringify({title, script, videoUrl, thumbnail, character: char.name, dialect: document.getElementById("dialect").selectedOptions[0].text, voice: document.getElementById("voice").selectedOptions[0].text, api: document.getElementById("apiEngine").selectedOptions[0].text, quality, date: new Date().toISOString()}).replace(/'/g, "\\'")})' class="neumorphism-btn px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <i data-lucide="save" class="w-4 h-4"></i>
-              حفظ في المكتبة
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.getElementById('resultsContainer').innerHTML = resultHTML;
-  document.getElementById('resultsSection').classList.remove('hidden');
-  
-  btn.disabled = false;
-  btn.innerHTML = '<i data-lucide="play-circle" class="w-6 h-6"></i> توليد الفيديو الآن';
-  lucide.createIcons();
-  showToast('تم توليد الفيديو بنجاح!', 'success');
-  
-  // Scroll to results
-  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+async function handleGenerate() {
+    if (state.isGenerating) return;
+    
+    const prompt = document.getElementById('promptInput').value.trim();
+    if (!prompt) {
+        showToast('اكتب وصف الفيديو أولاً', 'warning');
+        return;
+    }
+    
+    if (state.currentMode === 'meta') {
+        await enhancePromptForMeta();
+        return;
+    }
+    
+    if (state.currentMode === 'local' && !state.localModeEnabled) {
+        showToast('فعّل الوضع المحلي أولاً', 'warning');
+        toggleLocalMode();
+        return;
+    }
+    
+    state.isGenerating = true;
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner w-6 h-6"></div><span>جاري التوليد...</span>';
+    
+    simulateGeneration();
 }
 
-function previewVideo(url, title) {
-  document.getElementById('modalVideoTitle').textContent = title;
-  document.getElementById('modalVideo').src = url;
-  document.getElementById('videoModal').classList.add('show');
-  lucide.createIcons();
+function simulateGeneration() {
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressText = document.getElementById('progressText');
+    
+    progressBar.classList.remove('hidden');
+    let progress = 0;
+    
+    const stages = [
+        'تحليل المطالبة...',
+        'تحسين الوصف...',
+        'توليد الإطارات...',
+        'معالجة الحركة...',
+        'إضافة الصوت...',
+        'التصدير النهائي...'
+    ];
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressFill.style.width = progress + '%';
+        progressPercent.textContent = Math.floor(progress) + '%';
+        progressText.textContent = stages[Math.floor((progress / 100) * stages.length)];
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => completeGeneration(), 500);
+        }
+    }, 400);
 }
 
-function closeVideoModal() {
-  const modal = document.getElementById('videoModal');
-  const video = document.getElementById('modalVideo');
-  video.pause();
-  video.src = '';
-  modal.classList.remove('show');
-}
-
-async function downloadVideo(url, title) {
-  showToast('جاري تحضير التنزيل...', 'info');
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = `${title.replace(/[^a-z0-9أ-ي]/gi, '_')}.mp4`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(blobUrl);
-    document.body.removeChild(a);
-    showToast('تم بدء التنزيل', 'success');
-  } catch (err) {
-    showToast('فشل التنزيل', 'error');
-  }
-}
-
-async function saveToLibrary(videoData) {
-  await saveVideoToDB(videoData);
-}
-
-async function loadLibrary() {
-  const videos = await getAllVideosFromDB();
-  const container = document.getElementById('libraryContainer');
-  document.getElementById('libraryCount').textContent = videos.length;
-  
-  if (videos.length === 0) {
-    container.innerHTML = `
-      <div class="neumorphism-inset p-12 rounded-xl text-center text-[var(--text-secondary)] col-span-full">
-        <i data-lucide="folder-open" class="w-16 h-16 mx-auto mb-3 opacity-50"></i>
-        <p>لا توجد فيديوهات محفوظة بعد</p>
-        <p class="text-sm mt-2">قم بتوليد وحفظ الفيديوهات لتظهر هنا</p>
-      </div>
+function completeGeneration() {
+    state.isGenerating = false;
+    state.videoCount++;
+    
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i><span>توليد الفيديو</span>';
+    
+    document.getElementById('progressBar').classList.add('hidden');
+    document.getElementById('resultsSection').classList.remove('hidden');
+    
+    const preview = document.getElementById('videoPreview');
+    preview.innerHTML = `
+        <video controls class="w-full h-full" autoplay loop>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+        </video>
     `;
-  } else {
-    container.innerHTML = videos.reverse().map(video => `
-      <div class="neumorphism p-4 rounded-xl">
-        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-40 object-cover rounded-xl mb-3">
-        <h4 class="font-bold mb-1 truncate">${video.title}</h4>
-        <div class="text-xs text-[var(--text-secondary)] space-y-1 mb-3">
-          <p><i data-lucide="calendar" class="w-3 h-3 inline"></i> ${new Date(video.date).toLocaleDateString('ar-SA')}</p>
-          <p><i data-lucide="user" class="w-3 h-3 inline"></i> ${video.character}</p>
-          <p><i data-lucide="globe" class="w-3 h-3 inline"></i> ${video.dialect}</p>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="previewVideo('${video.videoUrl}', '${video.title}')" class="neumorphism-btn flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1">
-            <i data-lucide="eye" class="w-3 h-3"></i>
-            معاينة
-          </button>
-          <button onclick="downloadVideo('${video.videoUrl}', '${video.title}')" class="neumorphism-btn flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1">
-            <i data-lucide="download" class="w-3 h-3"></i>
-            تنزيل
-          </button>
-          <button onclick="deleteVideoFromDB(${video.id})" class="neumorphism-btn p-2 rounded-xl text-[var(--danger)]">
-            <i data-lucide="trash-2" class="w-3 h-3"></i>
-          </button>
-        </div>
-      </div>
-    `).join('');
-  }
-  lucide.createIcons();
+    
+    const prompt = document.getElementById('promptInput').value;
+    state.history.unshift({
+        id: Date.now(),
+        prompt: prompt.substring(0, 50) + '...',
+        mode: state.currentMode,
+        provider: state.currentProvider,
+        timestamp: new Date().toLocaleString('ar')
+    });
+    
+    if (state.history.length > 10) state.history.pop();
+    localStorage.setItem('history', JSON.stringify(state.history));
+    
+    updateStats();
+    renderHistory();
+    showToast('تم توليد الفيديو بنجاح! 🎉', 'success');
 }
 
-async function clearLibrary() {
-  if (!confirm('هل أنت متأكد من حذف جميع الفيديوهات؟')) return;
-  
-  const transaction = db.transaction([STORE_NAME], 'readwrite');
-  const store = transaction.objectStore(STORE_NAME);
-  await store.clear();
-  showToast('تم مسح المكتبة', 'success');
-  loadLibrary();
+function saveCharacter() {
+    const name = document.getElementById('charName').value.trim();
+    const desc = document.getElementById('charDesc').value.trim();
+    const tags = document.getElementById('charTags').value.trim();
+    
+    if (!name || !desc) {
+        showToast('املأ جميع الحقول', 'warning');
+        return;
+    }
+    
+    state.characters.push({
+        id: Date.now(),
+        name,
+        description: desc,
+        tags: tags.split(',').map(t => t.trim())
+    });
+    
+    localStorage.setItem('characters', JSON.stringify(state.characters));
+    document.getElementById('characterModal').classList.add('hidden');
+    document.getElementById('charName').value = '';
+    document.getElementById('charDesc').value = '';
+    document.getElementById('charTags').value = '';
+    
+    renderCharacters();
+    updateStats();
+    showToast('تم حفظ الشخصية ✓', 'success');
+}
+
+function renderCharacters() {
+    const list = document.getElementById('characterList');
+    if (state.characters.length === 0) {
+        list.innerHTML = '<div class="neumorphic-inset p-3 text-center text-sm text-[var(--text-secondary)]">لا توجد شخصيات محفوظة. اضغط "إضافة" لحفظ أول شخصية.</div>';
+        return;
+    }
+    
+    list.innerHTML = state.characters.map(char => `
+        <div class="neumorphic-inset p-3 rounded-xl">
+            <div class="flex justify-between items-start mb-2">
+                <div class="font-bold">${char.name}</div>
+                <button onclick="useCharacter(${char.id})" class="neumorphic-btn px-3 py-1 rounded-lg text-xs">
+                    <i class="fas fa-check ml-1"></i>
+                    استخدام
+                </button>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-2">${char.description}</p>
+            <div class="flex flex-wrap gap-1">
+                ${char.tags.map(tag => `<span class="badge bg-[var(--accent)]/20 text-[var(--accent)]">${tag}</span>`).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function useCharacter(id) {
+    const char = state.characters.find(c => c.id === id);
+    if (char) {
+        const current = document.getElementById('promptInput').value;
+        document.getElementById('promptInput').value = `${char.description}, ${current}`;
+        showToast(`تم تطبيق شخصية: ${char.name}`, 'success');
+    }
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (state.history.length === 0) {
+        list.innerHTML = '<div class="text-sm text-[var(--text-secondary)] text-center py-4">لا يوجد سجل بعد</div>';
+        return;
+    }
+    
+    list.innerHTML = state.history.map(item => `
+        <div class="neumorphic-inset p-3 rounded-lg text-xs cursor-pointer hover:bg-[var(--bg-secondary)]" onclick="loadHistory('${item.prompt}')">
+            <div class="font-bold mb-1 truncate">${item.prompt}</div>
+            <div class="flex justify-between text-[var(--text-secondary)]">
+                <span>${item.mode}</span>
+                <span>${item.timestamp}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadHistory(prompt) {
+    document.getElementById('promptInput').value = prompt;
+    showToast('تم تحميل الوصف', 'info');
+}
+
+function updateStats() {
+    document.getElementById('videoCount').textContent = state.videoCount;
+    document.getElementById('charCount').textContent = state.characters.length;
+    
+    const duration = parseInt(document.getElementById('duration').value);
+    const quality = document.getElementById('quality').value;
+    const timeMap = { '480p': 1, '720p': 2, '1080p': 4, '4k': 8 };
+    const eta = Math.ceil(duration * (timeMap[quality] || 2) / 5);
+    document.getElementById('etaTime').textContent = `~${eta} د`;
+}
+
+function toggleTheme() {
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    
+    const icon = document.querySelector('#themeToggle i');
+    icon.className = isDark ? 'fas fa-sun text-lg' : 'fas fa-moon text-lg';
+}
+
+function loadTheme() {
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.querySelector('#themeToggle i').className = 'fas fa-sun text-lg';
+    }
 }
 
 function showToast(message, type = 'info') {
-  const toast = document.getElementById('toast');
-  const icon = document.getElementById('toastIcon');
-  const messageEl = document.getElementById('toastMessage');
-  
-  messageEl.textContent = message;
-  
-  const icons = {
-    success: 'check-circle',
-    error: 'x-circle',
-    info: 'info'
-  };
-  
-  icon.setAttribute('data-lucide', icons[type] || 'info');
-  lucide.createIcons();
-  
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-orange-500',
+        info: 'bg-blue-500'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 fade-in`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
-function showUploadModal() {
-  showToast('ميزة رفع الشخصيات قادمة قريباً', 'info');
-}
-
-// Close modal on background click
-document.getElementById('videoModal').addEventListener('click', (e) => {
-  if (e.target.id === 'videoModal') closeVideoModal();
-});
-
-// Initialize
-window.addEventListener('DOMContentLoaded', async () => {
-  await initDB();
-  loadCharacters();
-  loadCharactersLibrary();
-  lucide.createIcons();
-});
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
 </body>
 </html>

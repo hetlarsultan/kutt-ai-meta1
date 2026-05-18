@@ -1,28 +1,3 @@
-# KuttAI Arabic - مولد فيديو عربي متكامل
+# KuttAI Arabic V3
 
-## المميزات
-- 5 منصات سحابية: Pika, Runway, Haiper, Luma, Kling = 176 فيديو مجاني/شهر
-- وضع Meta AI ذكي: يحسّن المطالبات تلقائياً
-- وضع محلي SadTalker + Coqui TTS: مجاني 100% أوفلاين
-- 5 لهجات: فصحى, خليجي, سوري, مصري, بدوي
-- 6 أصوات: بنت, ولد, طفل, رجل, شاب, عجوز
-- مكتبة شخصيات + استنساخ صوت
-- دعم فيديو حتى 10 دقائق
-
-## التشغيل السريع
-```bash
-pip install -r requirements.txt
-bash scripts/download_models.sh
-python server.py
-```
-
-أو بـDocker:
-```bash
-docker compose up
-```
-
-## مفاتيح API
-ضع مفاتيحك في التطبيق، تنحفظ محلياً فقط. لا ترفعها على GitHub.
-
-## الرخصة
-MIT - استخدم وعدل براحتك
+تطبيق مولد فيديو عربي متكامل
